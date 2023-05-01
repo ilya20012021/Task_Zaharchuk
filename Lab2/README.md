@@ -50,9 +50,6 @@ print(top_three['bytes']) #максимум трафика
 Получим графическое представление ответа:
 
 ``` python
-import matplotlib
-from matplotlib import pyplot as plt
-matplotlib.style.use('ggplot')
 by_hour = df[df['src'].isin(top_three.index)].groupby(['src','hour']).sum('bytes')['bytes'].reset_index('src').pivot(columns='src',values='bytes') #почасовая сводка
 by_hour.plot.bar()
 ```
@@ -60,6 +57,3 @@ by_hour.plot.bar()
 <img
 src="readme.markdown_strict_files/figure-markdown_strict/unnamed-chunk-5-1.png"
 width="672" />
-
-Как видно из графика, хост с IP-адресом 12.59.25.34 проявляет повышенную
-активность в 20:00 и 7:00
