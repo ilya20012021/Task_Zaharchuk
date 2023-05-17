@@ -1,0 +1,72 @@
+# Поиск утечки данных из сети
+Илья Москалёв
+
+## Задание 5: Обнаружение P2P трафика
+
+Иногда компрометация сети проявляется в нехарактерном трафике между
+хостами в локальной сети, который свидетельствует о горизонтальном
+перемещении (lateral movement). В нашей сети замечена система, которая
+ретранслирует по локальной сети полученные от панели управ- ления
+бот-сети команды, создав таким образом внутреннюю пиринговую сеть. Какой
+уникальный порт используется этой бот сетью для внутреннего общения
+между собой?
+
+## Ход работы
+
+Переведём полученный дамп трафика в датафрейм Pandas:
+
+``` python
+from pandas import *
+df = read_csv("./traffic_security.csv")
+df1 = df.iloc[::,1]
+b = []
+for i in range(len(df1)):
+  t = df1[i]
+  r = list(t)
+  v = []
+  for j in r:
+    if j != ".":
+      v.append(j)
+    else:
+      break
+  z = "".join(v)
+  b.append(z)
+  v.clear()
+```
+
+Определим внутренние узлы, наиболее часто общающиеся между собой:
+
+``` python
+c = set(b)
+d = list(c)
+m = []
+for i in d:
+    x = b.count(i)
+    m.append(x)
+
+df2 = DataFrame({"first_num_ip":d,
+                 "counts":m})
+
+df2 = df2.loc[df2["first_num_ip"].isin(["12","13","14"])]
+
+df3 = df2.loc[df2["counts"] == df2["counts"].max()]
+df4 = list(df3["first_num_ip"])[0]
+
+df5 = DataFrame({"First_num_ip":b})
+df6 = df5.loc[df5["First_num_ip"] == df4]
+df7 = []
+for i in df6.index:
+    df7.append(i)
+```
+
+Получим ответ:
+
+``` python
+df8 = df.loc[df7]
+df9 = df8.loc[df8.iloc[::,1] == df8.iloc[::,2]]
+df10 = df9.loc[df9.iloc[::,4] == df9.iloc[::,4].max()]
+df11 = df10.iloc[::,3]
+print(list(df11)[0])
+```
+
+    40
